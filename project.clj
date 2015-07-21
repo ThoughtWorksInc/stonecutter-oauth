@@ -1,4 +1,4 @@
-(defproject stonecutter-oauth "0.1.0-SNAPSHOT"
+(defproject org.clojars.d-cent/stonecutter-oauth "0.1.0-SNAPSHOT"
   :description "Client library for interacting with Stonecutter OAuth Server (see https://github.com/ThoughtWorksInc/stonecutter)"
   :url "https://github.com/ThoughtWorksInc/stonecutter-oauth"
   :min-lein-version "2.0.0"
