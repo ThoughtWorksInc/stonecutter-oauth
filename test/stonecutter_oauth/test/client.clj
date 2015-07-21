@@ -37,10 +37,11 @@
 (facts "about request-access-token!"
        (fact "obtains an access token from the auth server"
              (c/request-access-token! test-config ...auth-code...)
-             => {:user-id "<user-id>"
-                 :user-email "<user-email>"
-                 :access_token "<access-token>"
-                 :token_type "bearer"}
+             => {:status :success
+                 :token {:user-id "<user-id>"
+                         :user-email "<user-email>"
+                         :access_token "<access-token>"
+                         :token_type "bearer"}}
              (provided
                (http/post "<auth-provider-url>/api/token"
                           {:form-params {:grant_type "authorization_code"

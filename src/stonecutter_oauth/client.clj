@@ -20,7 +20,8 @@
                                                  :code          auth-code
                                                  :client_id     (:client-id stonecutter-config)
                                                  :client_secret (:client-secret stonecutter-config)}})]
-    (-> token-response :body (json/parse-string keyword))))
+    {:status :success
+     :token (-> token-response :body (json/parse-string keyword))}))
 
 (defn configure [auth-provider-url
                  client-id
