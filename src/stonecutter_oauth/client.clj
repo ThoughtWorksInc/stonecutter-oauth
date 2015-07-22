@@ -11,6 +11,10 @@
     (-> (r/redirect oauth-authorisation-path)
         (assoc-in [:headers "accept"] "text/html"))))
 
+(defn valid-token-body? [token-body]
+  (and (every? (partial contains? token-body) [:user-id :user-email :access_token :token_type])
+       (= "bearer" (:token_type token-body))))
+
 (defn request-access-token! [stonecutter-config auth-code]
   (let [callback-uri (:callback-uri stonecutter-config)
         oauth-token-path (str (:auth-provider-url stonecutter-config) "/api/token")
@@ -22,10 +26,8 @@
                                                  :client_secret (:client-secret stonecutter-config)}})
         token-body (-> token-response :body (json/parse-string keyword))]
 
-    (if (and (every? (partial contains? token-body) [:user-id :user-email :access_token :token_type])
-             (= "bearer" (:token_type token-body)))
-      {:status :success
-       :token (-> token-response :body (json/parse-string keyword))}
+    (if (valid-token-body? token-body)
+      token-body
       (throw (ex-info "Invalid token response")))))
 
 (defn configure [auth-provider-url
