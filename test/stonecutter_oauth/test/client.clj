@@ -49,4 +49,17 @@
                                          :code ...auth-code...
                                          :client_id "<client-id>"
                                          :client_secret "<client-secret>"}})
-               => {:body "{\"user-id\":\"<user-id>\",\"user-email\":\"<user-email>\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"})))
+               => {:body "{\"user-id\":\"<user-id>\",\"user-email\":\"<user-email>\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"}))
+
+       (tabular
+         (fact "throws an exception when the access token response body is not of the expected form"
+               (against-background
+                 (http/post "<auth-provider-url>/api/token" anything) => {:body ?body})
+               (c/request-access-token! test-config ...auth-code...) => (throws Exception))
+
+         ?body
+         "{\"user-email\":\"<user-email>\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"
+         "{\"user-id\":\"<user-id>\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"
+         "{\"user-id\":\"<user-id>\",\"user-email\":\"<user-email>\",\"token_type\":\"bearer\"}"
+         "{\"user-id\":\"<user-id>\",\"user-email\":\"<user-email>\",\"access_token\":\"<access-token>\"}"
+         "{\"user-id\":\"<user-id>\",\"user-email\":\"<user-email>\",\"access_token\":\"<access-token>\",\"token_type\":\"not-bearer\"}"))

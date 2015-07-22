@@ -19,9 +19,14 @@
                                                  :redirect_uri  callback-uri
                                                  :code          auth-code
                                                  :client_id     (:client-id stonecutter-config)
-                                                 :client_secret (:client-secret stonecutter-config)}})]
-    {:status :success
-     :token (-> token-response :body (json/parse-string keyword))}))
+                                                 :client_secret (:client-secret stonecutter-config)}})
+        token-body (-> token-response :body (json/parse-string keyword))]
+
+    (if (and (every? (partial contains? token-body) [:user-id :user-email :access_token :token_type])
+             (= "bearer" (:token_type token-body)))
+      {:status :success
+       :token (-> token-response :body (json/parse-string keyword))}
+      (throw (ex-info "Invalid token response")))))
 
 (defn configure [auth-provider-url
                  client-id
