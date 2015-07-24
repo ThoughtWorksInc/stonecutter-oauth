@@ -27,9 +27,8 @@
 (def test-config (c/configure "<auth-provider-url>" "<client-id>" "<client-secret>" "<callback-uri>"))
 
 (facts "about authorisation-redirect-response"
-       (fact "returns a redirect response to the correct endpoint, and with correct headers"
+       (fact "returns a redirect response to the correct endpoint"
              (:status (c/authorisation-redirect-response test-config)) => 302
-             (get-in (c/authorisation-redirect-response test-config) [:headers "accept"]) => "text/html"
              (get-in (c/authorisation-redirect-response test-config) [:headers "Location"])
              => "<auth-provider-url>/authorisation?client_id=<client-id>&response_type=code&redirect_uri=<callback-uri>"))
 

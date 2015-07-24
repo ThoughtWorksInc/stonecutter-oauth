@@ -8,8 +8,7 @@
         oauth-authorisation-path (str (:auth-provider-url stonecutter-config)
                                       "/authorisation?client_id=" (:client-id stonecutter-config)
                                       "&response_type=code&redirect_uri=" callback-uri)]
-    (-> (r/redirect oauth-authorisation-path)
-        (assoc-in [:headers "accept"] "text/html"))))
+    (r/redirect oauth-authorisation-path)))
 
 (defn valid-token-body? [token-body]
   (and (every? (partial contains? token-body) [:user-id :user-email :access_token :token_type])
