@@ -11,7 +11,7 @@
     (r/redirect oauth-authorisation-path)))
 
 (defn valid-token-body? [token-body]
-  (and (every? (partial contains? token-body) [:user-id :user-email :access_token :token_type])
+  (and (every? (partial contains? token-body) [:user-info :access_token :token_type])
        (= "bearer" (:token_type token-body))))
 
 (defn request-access-token! [stonecutter-config auth-code]
@@ -27,7 +27,7 @@
 
     (if (valid-token-body? token-body)
       token-body
-      (throw (ex-info "Invalid token response")))))
+      (throw (ex-info "Invalid token response" {:token-response-keys (keys token-body)})))))
 
 (defn configure [auth-provider-url
                  client-id
