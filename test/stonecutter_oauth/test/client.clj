@@ -36,7 +36,7 @@
 (facts "about request-access-token!"
        (fact "obtains an access token from the auth server"
              (c/request-access-token! test-config ...auth-code...)
-             => {:user-info "<user-info-map>"
+             => {:user-info {:sub "<user-id>"}
                  :access_token "<access-token>"
                  :token_type "bearer"}
              (provided
@@ -46,7 +46,7 @@
                                          :code ...auth-code...
                                          :client_id "<client-id>"
                                          :client_secret "<client-secret>"}})
-               => {:body "{\"user-info\":\"<user-info-map>\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"}))
+               => {:body "{\"user-info\":{\"sub\":\"<user-id>\"},\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"}))
 
        (tabular
          (fact "throws an exception when the access token response body is not of the expected form"
@@ -56,6 +56,7 @@
 
          ?body
          "{\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"
-         "{\"user-info\":\"<user-info-map>\",\"token_type\":\"bearer\"}"
-         "{\"user-info\":\"<user-info-map>\",\"access_token\":\"<access-token>\"}"
-         "{\"user-info\":\"<user-info-map>\",\"access_token\":\"<access-token>\",\"token_type\":\"not-bearer\"}"))
+         "{\"user-info\":{},\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"
+         "{\"user-info\":{\"sub\":\"<user-id>\"},\"token_type\":\"bearer\"}"
+         "{\"user-info\":{\"sub\":\"<user-id>\"},\"access_token\":\"<access-token>\"}"
+         "{\"user-info\":{\"sub\":\"<user-id>\"},\"access_token\":\"<access-token>\",\"token_type\":\"not-bearer\"}"))

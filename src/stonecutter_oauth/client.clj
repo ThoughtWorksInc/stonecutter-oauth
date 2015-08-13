@@ -10,8 +10,15 @@
                                       "&response_type=code&redirect_uri=" callback-uri)]
     (r/redirect oauth-authorisation-path)))
 
+(defn all-present? [m required-keys]
+  (every? (partial get m) required-keys))
+
+(defn valid-user-info? [user-info-m]
+  (all-present? user-info-m [:sub]))
+
 (defn valid-token-body? [token-body]
-  (and (every? (partial contains? token-body) [:user-info :access_token :token_type])
+  (and (all-present? token-body [:user-info :access_token :token_type])
+       (valid-user-info? (:user-info token-body))
        (= "bearer" (:token_type token-body))))
 
 (defn request-access-token! [stonecutter-config auth-code]
