@@ -5,6 +5,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clj-http "1.1.2"]
                  [cheshire "5.5.0"]
+                 [org.bitbucket.b_c/jose4j "0.4.4"]
                  [ring/ring-core "1.4.0"]]
   :profiles {:dev {:dependencies   [[midje "1.6.3"]]
                    :plugins        [[lein-midje "3.1.3"]]}}
