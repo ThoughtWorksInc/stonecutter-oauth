@@ -3,6 +3,28 @@
             [cheshire.core :as json]
             [clj-http.client :as http]))
 
+(defn all-present? [m required-keys]
+  (every? (partial get m) required-keys))
+
+(defn valid-additional-configuration? [additional-configuration]
+  (or (empty? additional-configuration) 
+      (and (= (:protocol additional-configuration) :openid)
+           (contains? additional-configuration :public-key))))
+
+(defn configure [auth-provider-url
+                 client-id
+                 client-secret
+                 callback-uri & additional-configuration]
+  (let [additional-configuration-m (apply hash-map additional-configuration)]
+    (if (and auth-provider-url client-id client-secret callback-uri
+             (valid-additional-configuration? additional-configuration-m))
+      (merge {:auth-provider-url auth-provider-url
+              :client-id client-id
+              :client-secret client-secret
+              :callback-uri callback-uri} 
+             additional-configuration-m) 
+      :invalid-configuration)))
+
 (defn authorisation-redirect-response [stonecutter-config]
   (let [callback-uri (:callback-uri stonecutter-config)
         protocol (:protocol stonecutter-config)
@@ -11,9 +33,6 @@
                                       "&response_type=code&redirect_uri=" callback-uri
                                       (when (= protocol :openid) "&scope=openid"))]
     (r/redirect oauth-authorisation-path)))
-
-(defn all-present? [m required-keys]
-  (every? (partial get m) required-keys))
 
 (defn valid-user-info? [user-info-m]
   (all-present? user-info-m [:sub]))
@@ -42,13 +61,3 @@
       token-body
       (throw (ex-info "Invalid token response" {:token-response-keys (keys token-body)})))))
 
-(defn configure [auth-provider-url
-                 client-id
-                 client-secret
-                 callback-uri & additional-configuration]
-  (if (and auth-provider-url client-id client-secret callback-uri)
-    (merge {:auth-provider-url auth-provider-url
-            :client-id client-id
-            :client-secret client-secret
-            :callback-uri callback-uri} (apply hash-map additional-configuration)) 
-    :invalid-configuration))
