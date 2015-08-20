@@ -83,26 +83,7 @@
 
 (def openid-test-config (c/configure "ISSUER" "CLIENT_ID" "<client-secret>" "<callback-uri>"
                                      :protocol :openid
-                                     :public-key "TODO: Needs to be an actual public key"))
-
-
-(defn json->key-pair [json-string] (JsonWebKey$Factory/newJwk json-string))
-
-(defn load-key-pair [path]
-  (-> (slurp path) json->key-pair))
-
-(defn decode [rsa-key-pair audience issuer id-token]
-  (let [jwtConsumer (-> (JwtConsumerBuilder.)
-                        (.setRequireExpirationTime)
-                        (.setAllowedClockSkewInSeconds 30)
-                        (.setRequireSubject)
-                        (.setExpectedIssuer issuer)
-                        (.setExpectedAudience (into-array [audience]))
-                        (.setVerificationKey (.getKey rsa-key-pair))
-                        (.build))]
-    (.getClaimsMap (.processToClaims jwtConsumer id-token))))
-
-(def token-expiring-in-500-years "eyJraWQiOiJ0ZXN0LWtleSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJJU1NVRVIiLCJhdWQiOiJDTElFTlRfSUQiLCJleHAiOjE3MjA3OTkzMjUyLCJpYXQiOjE0Mzk5OTI3NDAsInN1YiI6IlNVQkpFQ1QiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZW1haWwiOiJlbWFpbEBhZGRyZXNzLmNvbSJ9.PQWWJQGECzC8EchkfwGjQBBUfhFGoLDOjZ1Ohl1t-eo8rXDO4FxONk3rYEY9v01fVg3pzQW8zLJYcZ73gyE2ju8feHhwS8wYwcsgKq6XC-Zr9LwRJIeFpZoVcgMpvW21UHX1bxAhHE7WM_UzSerKtGkIuK21XraGVTiIB-0o8eWOJX0Rud8FXC3Cr0LdZeqDytPZDwM1Pbcr0eFyfNq9ngi75BFNTGHCMLGshJGt1LvQhDtTWifXDlwW5uk-kuOVavnQGK_i7qvrcy8c7lFCCPqd5X3x6EZJyfk-BZGgDT1ySwdM2EjRAi1W1nPAmdWms9rts0rkbk_Q73gEkWQpOw")
+                                     :public-key ...public-key...))
 
 (facts "about openid connect protocol"
        (facts "about authorisation-redirect-response"
@@ -110,6 +91,7 @@
                     (:status (c/authorisation-redirect-response openid-test-config)) => 302
                     (get-in (c/authorisation-redirect-response openid-test-config) [:headers "Location"])
                     => "ISSUER/authorisation?client_id=CLIENT_ID&response_type=code&redirect_uri=<callback-uri>&scope=openid"))
+
        (facts "about request-access-token!"
               (fact "obtains an access token and id token from the auth server"
                     (c/request-access-token! openid-test-config ...auth-code...)
@@ -125,7 +107,4 @@
                                                 :client_secret "<client-secret>"}})
                       => {:body "{\"id_token\":\"ID_TOKEN\",\"access_token\":\"<access-token>\",\"token_type\":\"bearer\"}"}))))
 
-(future-facts "about decoding openid connect id tokens"
-       (fact "can decode a signed id token"
-             (let [keypair (load-key-pair "./test/stonecutter_oauth/test-key.json")]
-               (decode keypair "CLIENT_ID" "ISSUER" token-expiring-in-500-years) => empty?)))
+
