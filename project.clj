@@ -6,6 +6,7 @@
                  [clj-http "1.1.2"]
                  [cheshire "5.5.0"]
                  [org.bitbucket.b_c/jose4j "0.4.4"]
+                 [org.slf4j/slf4j-simple "1.7.12"] 
                  [ring/ring-core "1.4.0"]]
   :profiles {:dev {:dependencies   [[midje "1.6.3"]]
                    :plugins        [[lein-midje "3.1.3"]]}}
