@@ -9,8 +9,11 @@
 (defn load-json-web-key [path]
   (-> (slurp path) json->key-pair))
 
-(defn decode [rsa-public-key audience issuer id-token]
-  (let [jwtConsumer (-> (JwtConsumerBuilder.)
+(defn decode [config-m id-token]
+  (let [rsa-public-key (:public-key config-m)
+        audience (:client-id config-m)
+        issuer (:auth-provider-url config-m)
+        jwtConsumer (-> (JwtConsumerBuilder.)
                         (.setRequireExpirationTime)
                         (.setAllowedClockSkewInSeconds 30)
                         (.setRequireSubject)
