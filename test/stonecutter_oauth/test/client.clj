@@ -1,10 +1,7 @@
 (ns stonecutter-oauth.test.client
   (:require [midje.sweet :refer :all]
             [clj-http.client :as http]
-            [stonecutter-oauth.client :as c])
-  (:import [org.jose4j.jwk JsonWebKey$Factory JsonWebKey$OutputControlLevel RsaJwkGenerator]
-           [org.jose4j.jwk RsaJwkGenerator JsonWebKey$OutputControlLevel]
-           [org.jose4j.jwt.consumer JwtConsumerBuilder]))
+            [stonecutter-oauth.client :as c]))
 
 (facts "about configure"
        (fact "returns a config map when all fields are passed"
@@ -32,14 +29,12 @@
                           ...client-id...
                           ...client-secret...
                           ...callback-uri...
-                          :protocol :openid
-                          :public-key ...public-key...)
+                          :protocol :openid)
              => {:auth-provider-url ...auth-provider-url...
                  :client-id ...client-id...
                  :client-secret ...client-secret...
                  :callback-uri ...callback-uri...
-                 :protocol :openid
-                 :public-key ...public-key...})
+                 :protocol :openid})
        
        (facts "about validating additional configuration arguments"
               (fact "returns invalid configuration when protocol is not recognised"
@@ -47,15 +42,7 @@
                                  ...client-id...
                                  ...client-secret...
                                  ...callback-uri...
-                                 :protocol :invalid 
-                                 :public-key ...public-key...) => :invalid-configuration)
-
-              (fact "returns invalid configuration when using :openid protocol, and public key is not provided"
-                    (c/configure ...auth-provider-url...
-                                 ...client-id...
-                                 ...client-secret...
-                                 ...callback-uri...
-                                 :protocol :openid) => :invalid-configuration)))
+                                 :protocol :invalid) => :invalid-configuration)))
 
 (def test-config (c/configure "<auth-provider-url>" "<client-id>" "<client-secret>" "<callback-uri>"))
 
@@ -96,8 +83,7 @@
                 "{\"user-info\":{\"sub\":\"<user-id>\"},\"access_token\":\"<access-token>\",\"token_type\":\"not-bearer\"}")))
 
 (def openid-test-config (c/configure "ISSUER" "CLIENT_ID" "<client-secret>" "<callback-uri>"
-                                     :protocol :openid
-                                     :public-key ...public-key...))
+                                     :protocol :openid))
 
 (facts "about openid connect protocol"
        (facts "about authorisation-redirect-response"

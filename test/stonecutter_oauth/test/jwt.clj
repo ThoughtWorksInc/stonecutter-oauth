@@ -4,8 +4,7 @@
            [stonecutter-oauth.jwt :as jwt]))
 
 (def openid-test-config (c/configure "ISSUER" "CLIENT_ID" "<client-secret>" "<callback-uri>"
-                                     :protocol :openid
-                                     :public-key (jwt/load-json-web-key "./test/stonecutter_oauth/test-key.json")))
+                                     :protocol :openid))
 
 (def token-expiring-in-500-years "eyJraWQiOiJ0ZXN0LWtleSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJJU1NVRVIiLCJhdWQiOiJDTElFTlRfSUQiLCJleHAiOjE3MjA3OTkzMjUyLCJpYXQiOjE0Mzk5OTI3NDAsInN1YiI6IlNVQkpFQ1QiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZW1haWwiOiJlbWFpbEBhZGRyZXNzLmNvbSJ9.PQWWJQGECzC8EchkfwGjQBBUfhFGoLDOjZ1Ohl1t-eo8rXDO4FxONk3rYEY9v01fVg3pzQW8zLJYcZ73gyE2ju8feHhwS8wYwcsgKq6XC-Zr9LwRJIeFpZoVcgMpvW21UHX1bxAhHE7WM_UzSerKtGkIuK21XraGVTiIB-0o8eWOJX0Rud8FXC3Cr0LdZeqDytPZDwM1Pbcr0eFyfNq9ngi75BFNTGHCMLGshJGt1LvQhDtTWifXDlwW5uk-kuOVavnQGK_i7qvrcy8c7lFCCPqd5X3x6EZJyfk-BZGgDT1ySwdM2EjRAi1W1nPAmdWms9rts0rkbk_Q73gEkWQpOw")
 
@@ -19,6 +18,6 @@
                     :sub "SUBJECT"})
 
 (facts "about decoding openid connect id tokens"
-       (fact "can decode a signed id token"
+       (fact "can decode a signed id token using provided id token"
              (let [public-key (jwt/load-json-web-key "./test/stonecutter_oauth/test-key.json")]
-               (jwt/decode openid-test-config token-expiring-in-500-years) => token-content)))
+               (jwt/decode openid-test-config token-expiring-in-500-years public-key) => token-content)))

@@ -7,9 +7,8 @@
   (every? (partial get m) required-keys))
 
 (defn valid-additional-configuration? [additional-configuration]
-  (or (empty? additional-configuration) 
-      (and (= (:protocol additional-configuration) :openid)
-           (contains? additional-configuration :public-key))))
+  (or (empty? additional-configuration)
+      (= (:protocol additional-configuration) :openid)))
 
 (defn configure [auth-provider-url
                  client-id
