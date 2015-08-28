@@ -1,5 +1,6 @@
 (ns stonecutter-oauth.test.jwt
  (:require [midje.sweet :refer :all]
+           [clj-http.client :as http]
            [stonecutter-oauth.client :as c]
            [stonecutter-oauth.jwt :as jwt]))
 
@@ -19,5 +20,18 @@
 
 (facts "about decoding openid connect id tokens"
        (fact "can decode a signed id token using provided id token"
-             (let [public-key (jwt/load-json-web-key "./test/stonecutter_oauth/test-key.json")]
-               (jwt/decode openid-test-config token-expiring-in-500-years public-key) => token-content)))
+             (let [public-key-string (slurp "./test/stonecutter_oauth/test-key.json")]
+               (jwt/decode openid-test-config token-expiring-in-500-years public-key-string) => token-content)))
+
+(facts "about getting public keys from jwk-set-url"
+       (fact "returns the only key in the 'set'"
+             (jwt/get-public-key-string-from-jwk-set-url ...jwks-url...) => "{\"some-key\":1}"
+              (provided
+                (http/get ...jwks-url... {:accept :json :as :json})
+                => {:body {:keys [{:some-key 1}]}}))
+
+       (fact "throws an exception when the 'set' contains more than one key"
+             (jwt/get-public-key-string-from-jwk-set-url ...jwks-url...) => (throws Exception)
+             (provided
+               (http/get ...jwks-url... {:accept :json :as :json})
+               => {:body {:keys [{:some-key 1} {:some-other-key 2}]}})))
